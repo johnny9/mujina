@@ -39,10 +39,10 @@ embedded Linux distribution optimized for Bitcoin mining hardware.
 
 Currently supported:
 - [**Bitaxe Gamma**](mujina-miner/src/board/bitaxe_gamma.md) with BM1370 ASIC
+- [**BitaxeBonanza**](mujina-miner/src/board/bitaxe_bonanza.md) with four Intel BZM2 ASICs
 
 Planned support:
 - **EmberOne** with BM1362 ASIC
-- **EmberOne** with Intel BZM2 ASICs
 - Antminer S19j Pro hash boards
 - Any and all ASIC mining hardware
 
@@ -71,6 +71,8 @@ Planned support:
 
 - [Bitaxe Gamma Board Guide](mujina-miner/src/board/bitaxe_gamma.md) - Hardware
   and software interface documentation for Bitaxe Gamma
+- [BitaxeBonanza Board Guide](mujina-miner/src/board/bitaxe_bonanza.md) - Hardware
+  and software interface documentation for BitaxeBonanza
 
 ## Build Requirements
 

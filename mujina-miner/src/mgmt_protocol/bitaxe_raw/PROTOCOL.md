@@ -57,6 +57,18 @@ request-response based with packet framing.
 
 For GPIO operations, the command byte represents the pin number.
 
+### BitaxeBonanza GPIO Map
+
+The BitaxeBonanza firmware uses the standard GPIO page (`0x06`) with these
+command values:
+
+- `0x00` - ASIC reset compatibility alias (`RST_N`, active-low reset)
+- `0x01` - `5V_EN` power enable
+- `0x02` - `ASIC_RST` active-low reset
+- `0x03` - `ASIC_TRIP` status
+- `0x04` - `VR_EN` regulator enable
+- `0x05` - `VR_PGOOD` regulator power-good status
+
 ### Set GPIO
 - Command: Pin number (e.g., 0x00 for pin 0)
 - Data: [level] where level is 0x00 (low) or 0x01 (high)
@@ -78,4 +90,6 @@ For GPIO operations, the command byte represents the pin number.
 
 3. The protocol uses little-endian byte ordering for multi-byte values.
 
-4. GPIO pin 0 is used for ASIC reset control on Bitaxe boards (active low).
+4. GPIO pin 0 is used for ASIC reset control on classic Bitaxe boards
+   (active low). BitaxeBonanza keeps this as a reset compatibility alias and
+   exposes additional board controls at pins 1 through 5.
