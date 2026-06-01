@@ -1,5 +1,5 @@
-pub(crate) mod birds;
 pub(crate) mod bitaxe;
+pub(crate) mod bitaxe_bonanza;
 pub mod cpu;
 pub(crate) mod emberone;
 pub mod pattern;

@@ -14,7 +14,7 @@ use super::{
 };
 use crate::transport::serial::SerialStream;
 
-/// Default BZM2 UART baud rate used by BIRDS data port.
+/// Default BZM2 UART baud rate used by the BitaxeBonanza data port.
 pub const DEFAULT_BZM2_DATA_BAUD: u32 = 5_000_000;
 
 /// Default timeout for each request/response step.

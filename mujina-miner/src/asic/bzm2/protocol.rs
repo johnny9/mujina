@@ -3,7 +3,7 @@
 //! This module implements pass-1 support for bring-up:
 //! - Command encoding for `NOOP`, `READREG`, `WRITEREG`
 //! - Response decoding for `NOOP`, `READREG`, `READRESULT`, and `DTS/VS`
-//! - 9-bit TX framing via the BIRDS USB bridge format
+//! - 9-bit TX framing via the BitaxeBonanza USB bridge format
 
 use std::io;
 
@@ -683,7 +683,7 @@ impl Decoder for FrameCodec {
                     }
 
                     let engine_status = u16::from_be_bytes([src[2], src[3]]);
-                    // BIRDS/bzm2 layout packs [status:4 | engine_id:12] in network byte order.
+                    // BitaxeBonanza BZM2 layout packs [status:4 | engine_id:12] in network byte order.
                     let engine_id = engine_status & 0x0fff;
                     let status = ((engine_status >> 12) & 0x000f) as u8;
                     tracing::trace!(rx = %format_hex(&src[..FRAME_LEN]), "BZM2 rx READRESULT frame");

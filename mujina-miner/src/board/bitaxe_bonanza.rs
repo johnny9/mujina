@@ -65,7 +65,7 @@ fn format_hex(data: &[u8]) -> String {
 }
 
 /// BitaxeBonanza mining board.
-pub struct BirdsBoard {
+pub struct BitaxeBonanzaBoard {
     device_info: UsbDeviceInfo,
     control_port: Option<String>,
     data_reader: Option<FramedRead<SerialReader, FrameCodec>>,
@@ -74,7 +74,7 @@ pub struct BirdsBoard {
     thread_shutdown: Option<watch::Sender<ThreadRemovalSignal>>,
 }
 
-impl BirdsBoard {
+impl BitaxeBonanzaBoard {
     /// Create a new BitaxeBonanza board instance.
     pub fn new(device_info: UsbDeviceInfo) -> Result<Self, BoardError> {
         Ok(Self {
@@ -117,7 +117,7 @@ impl BirdsBoard {
             "Running BitaxeBonanza ASIC smoke test during initialization"
         );
 
-        // Match known-good bring-up sequence from birds_asyncio.py:
+        // Match known-good BitaxeBonanza bring-up sequence:
         // 1) VR off and settle
         // 2) Enable 5V rail
         // 3) Enable VR
@@ -314,33 +314,43 @@ impl BirdsBoard {
     }
 }
 
-struct BirdsAsicEnable {
+struct BitaxeBonanzaAsicEnable {
     control_port: String,
 }
 
 #[async_trait]
-impl AsicEnable for BirdsAsicEnable {
+impl AsicEnable for BitaxeBonanzaAsicEnable {
     async fn enable(&mut self) -> anyhow::Result<()> {
         let mut control_stream = tokio_serial::new(&self.control_port, CONTROL_UART_BAUD)
             .open_native_async()
             .map_err(|e| anyhow::anyhow!("failed to open control port: {}", e))?;
-        BirdsBoard::control_gpio_write(&mut control_stream, CTRL_ID_GPIO, GPIO_ASIC_RST, true)
-            .await
-            .map_err(|e| anyhow::anyhow!("failed to release BZM2 reset: {}", e))
+        BitaxeBonanzaBoard::control_gpio_write(
+            &mut control_stream,
+            CTRL_ID_GPIO,
+            GPIO_ASIC_RST,
+            true,
+        )
+        .await
+        .map_err(|e| anyhow::anyhow!("failed to release BZM2 reset: {}", e))
     }
 
     async fn disable(&mut self) -> anyhow::Result<()> {
         let mut control_stream = tokio_serial::new(&self.control_port, CONTROL_UART_BAUD)
             .open_native_async()
             .map_err(|e| anyhow::anyhow!("failed to open control port: {}", e))?;
-        BirdsBoard::control_gpio_write(&mut control_stream, CTRL_ID_GPIO, GPIO_ASIC_RST, false)
-            .await
-            .map_err(|e| anyhow::anyhow!("failed to assert BZM2 reset: {}", e))
+        BitaxeBonanzaBoard::control_gpio_write(
+            &mut control_stream,
+            CTRL_ID_GPIO,
+            GPIO_ASIC_RST,
+            false,
+        )
+        .await
+        .map_err(|e| anyhow::anyhow!("failed to assert BZM2 reset: {}", e))
     }
 }
 
 #[async_trait]
-impl Board for BirdsBoard {
+impl Board for BitaxeBonanzaBoard {
     fn board_info(&self) -> BoardInfo {
         BoardInfo {
             model: BITAXE_BONANZA_PRODUCT.to_string(),
@@ -386,7 +396,7 @@ impl Board for BirdsBoard {
             .ok_or(BoardError::InitializationFailed(
                 "No BitaxeBonanza control port available".into(),
             ))?;
-        let asic_enable = BirdsAsicEnable { control_port };
+        let asic_enable = BitaxeBonanzaAsicEnable { control_port };
         let peripherals = BoardPeripherals {
             asic_enable: Some(Box::new(asic_enable)),
             voltage_regulator: None,
@@ -411,7 +421,7 @@ impl Board for BirdsBoard {
 
 // Factory function to create a BitaxeBonanza board from USB device info
 async fn create_from_usb(device: UsbDeviceInfo) -> crate::error::Result<Box<dyn Board + Send>> {
-    let mut board = BirdsBoard::new(device)
+    let mut board = BitaxeBonanzaBoard::new(device)
         .map_err(|e| Error::Hardware(format!("Failed to create board: {}", e)))?;
 
     board
@@ -452,7 +462,7 @@ mod tests {
             "/sys/devices/test".to_string(),
         );
 
-        let board = BirdsBoard::new(device);
+        let board = BitaxeBonanzaBoard::new(device);
         assert!(board.is_ok());
 
         let board = board.unwrap();
@@ -479,15 +489,15 @@ mod tests {
         );
         assert!(pattern.matches(&device));
 
-        let old_product = UsbDeviceInfo::new_for_test(
+        let unsupported_product = UsbDeviceInfo::new_for_test(
             BITAXE_BONANZA_VID,
             BITAXE_BONANZA_PID,
             Some("92eed1c0".to_string()),
             Some(BITAXE_BONANZA_MANUFACTURER.to_string()),
-            Some("BIRDS".to_string()),
+            Some("UnsupportedBzm2Board".to_string()),
             "/sys/devices/test".to_string(),
         );
-        assert!(!pattern.matches(&old_product));
+        assert!(!pattern.matches(&unsupported_product));
     }
 
     #[test]

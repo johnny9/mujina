@@ -3165,7 +3165,7 @@ mod tests {
 
     #[test]
     fn test_bzm2_double_sha_matches_known_trace_sample() {
-        // Captured from birds-bzm2 valid-share-hash-input logging.
+        // Captured from BitaxeBonanza valid-share-hash-input logging.
         let midstate =
             hex::decode("07348faef527b8ec3733171cb0781bc545efb4220d71e0a5b54af23de2106bfd")
                 .expect("midstate hex should parse");
